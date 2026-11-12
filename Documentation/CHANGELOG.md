@@ -1,15 +1,18 @@
 # LOVEVERSE - Changelog
 
+## [1.1.0] - 2026-11-12
+### Milestone: Four-Platform Universal Support (Android, iOS, Windows, Linux)
+
+- **Platform Abstraction Layer (PAL):** Implemented `IPlatformService`, `PlatformDetector`, `PlatformStorageAdapter`, `PlatformPermissionService`, and `PlatformInputAdapter`.
+- **Cross-Platform Storage:** Eliminated all hardcoded path separators; normalized persistent and cache storage paths across POSIX (Linux, Android, iOS) and Windows.
+- **Mobile Safe Area & Notch Support:** Implemented `SafeAreaHandler` dynamically binding UI anchors to iPhone notches, Dynamic Island, and Android punch-hole cameras.
+- **Unified Input Adapter:** Dynamically mounts mobile touch virtual joystick canvas on Android/iOS, and activates WASD + Mouse bindings on Windows/Linux with universal controller support.
+- **Four-Platform Build Automation:** Implemented `PlatformBuildProfiles.cs` and `Tools/build_platforms.sh` supporting headless builds for Android (ARM64 APK/AAB), iOS (Xcode project), Windows (x64 standalone), and Linux (x64 standalone).
+- **Scalable Graphics Presets:** Added `GraphicsQualityConfig` supporting Low, Medium, High, and Ultra tiers with dynamic resolution scale and platform-specific defaults.
+- **Cross-Platform Test Suite:** Added `PlatformTests.cs` validating platform detection, storage path normalization, and quality preset scaling.
+
 ## [1.0.0-MVP] - 2026-11-12
 ### Milestone: Production Architecture & Full 10-Part Engine Verified
 
-- **Part 1 (Architecture & Setup):** Initialized Git repository, Unity 6 LTS directory hierarchy, `Packages/manifest.json`, 11 Assembly Definitions, and full documentation suite.
-- **Part 2 (Core Foundation):** Implemented `ServiceRegistry`, `EventBus`, `GameBootstrapper`, `SceneService`, `Lg` structured logger with correlation IDs, and ScriptableObject configs (`MovementConfig`, `CameraConfig`, `RomanceConfig`, `WorldConfig`, `AudioConfig`, `NetworkConfig`).
-- **Part 3 (Locomotion & Input):** Implemented cross-platform `IInputService` (Android virtual analog stick + Windows WASD/Mouse), `ThirdPersonController` (`CharacterController`, slope handling, ground check, gravity, acceleration), and `LocomotionStateMachine`.
-- **Part 4 (Camera & Anime Shaders):** Implemented `CameraController` (Cinemachine orbit with sphere-cast collision avoidance), `PhotoModeController` (FOV, HUD hiding, viewport capture), and custom URP `AnimeToonCharacter.shader` (stepped cel shading, rim lighting, inverted hull outline).
-- **Part 5 (Character Customization):** Implemented `CharacterAppearance`, `CustomizationItem`, item registries (Hairstyles, Eyes, Skins, Outfits), `CharacterCustomizationService`, and `CharacterVisualApplier`.
-- **Part 6 (Romantic Interactions):** Implemented `InteractionType` (Wave, HighFive, HoldHands, Hug, Dance, SitTogether, Stargaze, GiveGift), `InteractionDetector` (distance + view angle), `InteractionRequestService` (consent workflow with 15s timer), `InteractionPermissionService` (cooldowns), and `PairedAnimationController` (anchor positioning).
-- **Part 7 (Multiplayer Networking):** Implemented `INetworkService`, `RoomCodeGenerator` (cryptographic 6-character room codes with ambiguous character omission), `NetworkManager`, `NetworkCharacterState` (Hermite interpolation), and `SessionLifecycleService` (reconnection window).
-- **Part 8 (Backend Services & Cloud DB):** Implemented Node.js + TypeScript Fastify server, Firebase Auth middleware, Cloud Firestore repository, REST endpoints (`/auth/session`, `/users/me`, `/rooms`, `/rooms/join`, `/inventory`, `/memories`, `/reports`, `/openapi.json`), and `firestore.rules`.
-- **Part 9 (Home, Memories & Garden):** Implemented `HomePlacementService` (0.5m grid snapping & collision clearance), `MemoryService` (PNG disk cache and cloud metadata), `EnvironmentController` (24h sun rotation & ambient color blending), `WeatherController` (Clear, Rain, Fog), and `RomanticGardenBuilder`.
-- **Part 10 (Integration & Verification):** Added 10 C# unit and simulation test suites, expanded backend automated test suite to 12 passing tests, and verified end-to-end integration pipeline via `Tools/verify_build.sh`.
+- Implemented Parts 1 through 10 of the Master Development Specification.
+- Validated with 10 C# NUnit test suites and 12 Fastify / Vitest backend integration tests.

@@ -1,0 +1,26 @@
+{
+    "name": "Loveverse.Editor",
+    "rootNamespace": "Loveverse.Editor",
+    "references": [
+        "Loveverse.Core",
+        "Loveverse.Movement",
+        "Loveverse.Characters",
+        "Loveverse.Romance",
+        "Loveverse.Networking",
+        "Loveverse.Home",
+        "Loveverse.Memories",
+        "Loveverse.World",
+        "Loveverse.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

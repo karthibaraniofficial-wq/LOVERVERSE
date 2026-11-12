@@ -10,6 +10,8 @@ Shader "Loveverse/AnimeToonCharacter"
         _RimColor ("Rim Light Color", Color) = (1, 0.9, 0.95, 1)
         _RimPower ("Rim Light Exponent", Range(1, 10)) = 4.0
         _RimIntensity ("Rim Intensity", Range(0, 2)) = 0.8
+        _OutlineColor ("Outline Color", Color) = (0.2, 0.15, 0.25, 1)
+        _OutlineWidth ("Outline Width", Range(0.0001, 0.01)) = 0.002
     }
 
     SubShader
@@ -17,10 +19,66 @@ Shader "Loveverse/AnimeToonCharacter"
         Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "Queue" = "Geometry" }
         LOD 200
 
+        // Outline Pass (Inverted Hull)
+        Pass
+        {
+            Name "Outline"
+            Tags { "LightMode" = "SRPDefaultUnlit" }
+            Cull Front
+            ZWrite On
+
+            HLSLPROGRAM
+            #pragma vertex VertOutline
+            #pragma fragment FragOutline
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS   : NORMAL;
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+            };
+
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseMap_ST;
+                float4 _BaseColor;
+                float4 _ShadowColor;
+                float4 _RimColor;
+                float  _CelThreshold;
+                float  _CelSoftness;
+                float  _RimPower;
+                float  _RimIntensity;
+                float4 _OutlineColor;
+                float  _OutlineWidth;
+            CBUFFER_END
+
+            Varyings VertOutline(Attributes input)
+            {
+                Varyings output;
+                float3 normalOS = normalize(input.normalOS);
+                float3 extrudedPos = input.positionOS.xyz + normalOS * _OutlineWidth;
+                output.positionCS = TransformObjectToHClip(extrudedPos);
+                return output;
+            }
+
+            half4 FragOutline(Varyings input) : SV_Target
+            {
+                return _OutlineColor;
+            }
+            ENDHLSL
+        }
+
+        // Forward Lit Anime Cel Shading Pass
         Pass
         {
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForward" }
+            Cull Back
 
             HLSLPROGRAM
             #pragma vertex Vert
@@ -58,6 +116,8 @@ Shader "Loveverse/AnimeToonCharacter"
                 float  _CelSoftness;
                 float  _RimPower;
                 float  _RimIntensity;
+                float4 _OutlineColor;
+                float  _OutlineWidth;
             CBUFFER_END
 
             Varyings Vert(Attributes input)

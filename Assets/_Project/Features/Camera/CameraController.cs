@@ -39,6 +39,14 @@ namespace Loveverse.Camera
             _inputService = inputService;
         }
 
+        private void Awake()
+        {
+            if (_config == null)
+            {
+                _config = ScriptableObject.CreateInstance<CameraConfig>();
+            }
+        }
+
         private void Start()
         {
             if (_inputService == null && ServiceRegistry.Instance.TryResolve<IInputService>(out var input))
@@ -72,7 +80,7 @@ namespace Loveverse.Camera
                     break;
                 case CameraMode.ThirdPersonExplore:
                 default:
-                    _targetDistance = _config.DefaultDistance;
+                    _targetDistance = _config != null ? _config.DefaultDistance : 3.5f;
                     break;
             }
         }

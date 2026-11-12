@@ -55,3 +55,4 @@ yarn-error.log*
 # Firebase Service Accounts & Credentials
 *serviceAccountKey*.json
 *firebase-adminsdk*.json
+test-results.xml

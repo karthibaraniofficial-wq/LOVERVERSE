@@ -20,6 +20,17 @@ namespace Loveverse.Networking
         public event Action<string> OnPlayerLeft;
         public event Action OnDisconnected;
 
+        private async void Awake()
+        {
+            if (ServiceRegistry.Instance.TryResolve<INetworkService>(out _))
+            {
+                return;
+            }
+
+            await InitializeAsync();
+            ServiceRegistry.Instance.Register<INetworkService>(this);
+        }
+
         public Task InitializeAsync()
         {
             IsInitialized = true;

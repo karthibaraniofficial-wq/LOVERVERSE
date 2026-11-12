@@ -13,6 +13,14 @@ namespace Loveverse.Romance
         [SerializeField] private InteractionRequestService _requestService;
         [SerializeField] private PairedAnimationController _pairedController;
 
+        private void Awake()
+        {
+            if (_detector == null) _detector = GetComponent<InteractionDetector>();
+            if (_requestService == null) _requestService = GetComponent<InteractionRequestService>();
+            if (_permissions == null) _permissions = GetComponent<InteractionPermissionService>() ?? gameObject.AddComponent<InteractionPermissionService>();
+            if (_pairedController == null) _pairedController = GetComponent<PairedAnimationController>() ?? gameObject.AddComponent<PairedAnimationController>();
+        }
+
         private void Start()
         {
             if (_requestService != null)

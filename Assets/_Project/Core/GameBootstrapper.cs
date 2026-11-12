@@ -13,8 +13,8 @@ namespace Loveverse.Core
         private static bool _isBootstrapped;
 
         [Header("Startup Configuration")]
-        [SerializeField] private string _initialGameplayScene = "LoveTown";
-        [SerializeField] private bool _autoLoadInitialScene = false;
+        [SerializeField] private string _initialScene = "MainMenu";
+        [SerializeField] private bool _autoLoadInitialScene = true;
 
         private async void Awake()
         {
@@ -27,33 +27,84 @@ namespace Loveverse.Core
             _isBootstrapped = true;
             DontDestroyOnLoad(gameObject);
 
-            Lg.Info("Starting LOVEVERSE Bootstrapper...");
-            await InitializeCoreServicesAsync();
+            Lg.Info("========================================");
+            Lg.Info("   💖 LOVEVERSE — Game Bootstrapper     ");
+            Lg.Info("========================================");
 
-            if (_autoLoadInitialScene)
+            await InitializeCoreServicesAsync();
+        }
+
+        private async void Start()
+        {
+            if (_autoLoadInitialScene && !string.IsNullOrEmpty(_initialScene))
             {
-                var sceneService = ServiceRegistry.Instance.Resolve<ISceneService>();
-                await sceneService.LoadSceneAsync(_initialGameplayScene);
+                if (ServiceRegistry.Instance.TryResolve<ISceneService>(out var sceneService))
+                {
+                    Lg.Info($"Auto-loading initial scene: {_initialScene}");
+                    await sceneService.LoadSceneAsync(_initialScene);
+                }
             }
         }
 
         private async Task InitializeCoreServicesAsync()
         {
             // 1. Register PlatformService
-            var platformGo = new GameObject("[Service] PlatformService");
-            platformGo.transform.SetParent(transform);
-            var platformService = platformGo.AddComponent<PlatformService>();
-            await platformService.InitializeAsync();
-            ServiceRegistry.Instance.Register<IPlatformService>(platformService);
+            if (!ServiceRegistry.Instance.TryResolve<IPlatformService>(out _))
+            {
+                var platformService = GetComponentInChildren<PlatformService>();
+                if (platformService == null)
+                {
+                    var platformGo = new GameObject("[Service] PlatformService");
+                    platformGo.transform.SetParent(transform);
+                    platformService = platformGo.AddComponent<PlatformService>();
+                }
+                await platformService.InitializeAsync();
+                ServiceRegistry.Instance.Register<IPlatformService>(platformService);
+            }
 
             // 2. Register SceneService
-            var sceneServiceGo = new GameObject("[Service] SceneService");
-            sceneServiceGo.transform.SetParent(transform);
-            var sceneService = sceneServiceGo.AddComponent<SceneService>();
-            await sceneService.InitializeAsync();
-            ServiceRegistry.Instance.Register<ISceneService>(sceneService);
+            if (!ServiceRegistry.Instance.TryResolve<ISceneService>(out _))
+            {
+                var sceneService = GetComponentInChildren<SceneService>();
+                if (sceneService == null)
+                {
+                    var sceneServiceGo = new GameObject("[Service] SceneService");
+                    sceneServiceGo.transform.SetParent(transform);
+                    sceneService = sceneServiceGo.AddComponent<SceneService>();
+                }
+                await sceneService.InitializeAsync();
+                ServiceRegistry.Instance.Register<ISceneService>(sceneService);
+            }
 
-            Lg.Info("Foundational Core Services (Platform + Scene) successfully registered.");
+            // 3. Register AuthService
+            if (!ServiceRegistry.Instance.TryResolve<IAuthService>(out _))
+            {
+                var authService = GetComponentInChildren<AuthService>();
+                if (authService == null)
+                {
+                    var authGo = new GameObject("[Service] AuthService");
+                    authGo.transform.SetParent(transform);
+                    authService = authGo.AddComponent<AuthService>();
+                }
+                await authService.InitializeAsync();
+                ServiceRegistry.Instance.Register<IAuthService>(authService);
+            }
+
+            // 4. Register BackendService
+            if (!ServiceRegistry.Instance.TryResolve<IBackendService>(out _))
+            {
+                var backendService = GetComponentInChildren<BackendService>();
+                if (backendService == null)
+                {
+                    var backendGo = new GameObject("[Service] BackendService");
+                    backendGo.transform.SetParent(transform);
+                    backendService = backendGo.AddComponent<BackendService>();
+                }
+                await backendService.InitializeAsync();
+                ServiceRegistry.Instance.Register<IBackendService>(backendService);
+            }
+
+            Lg.Info("Core Services (Platform, Scene, Auth, Backend) successfully registered.");
         }
     }
 }

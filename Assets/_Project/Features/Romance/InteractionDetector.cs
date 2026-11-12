@@ -19,6 +19,14 @@ namespace Loveverse.Romance
         public event Action<Transform> OnPartnerEnteredRange;
         public event Action OnPartnerExitedRange;
 
+        private void Awake()
+        {
+            if (_config == null)
+            {
+                _config = ScriptableObject.CreateInstance<RomanceConfig>();
+            }
+        }
+
         private void Update()
         {
             if (_config == null) return;

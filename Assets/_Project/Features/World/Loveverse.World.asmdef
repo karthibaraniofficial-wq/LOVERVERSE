@@ -2,7 +2,13 @@
     "name": "Loveverse.World",
     "rootNamespace": "Loveverse.World",
     "references": [
-        "Loveverse.Core"
+        "Loveverse.Core",
+        "Loveverse.Movement",
+        "Loveverse.Camera",
+        "Loveverse.Characters",
+        "Loveverse.Romance",
+        "Loveverse.Networking",
+        "Loveverse.Home"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

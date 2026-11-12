@@ -28,7 +28,15 @@ namespace Loveverse.Home
         [SerializeField] private float _gridSize = 0.5f;
         [SerializeField] private LayerMask _obstacleLayers = ~0;
 
+        public bool IsEditModeActive { get; private set; }
+
         private readonly Dictionary<string, GameObject> _placedInstances = new Dictionary<string, GameObject>();
+
+        public void ToggleEditMode()
+        {
+            IsEditModeActive = !IsEditModeActive;
+            Lg.Info($"Home Decorating Edit Mode: {IsEditModeActive}");
+        }
 
         public Vector3 SnapToGrid(Vector3 worldPosition)
         {

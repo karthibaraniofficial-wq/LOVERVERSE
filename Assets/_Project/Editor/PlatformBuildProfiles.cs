@@ -16,7 +16,15 @@ namespace Loveverse.Editor
         {
             "Assets/_Project/Scenes/Bootstrap.unity",
             "Assets/_Project/Scenes/MainMenu.unity",
-            "Assets/_Project/Scenes/LoveTown.unity"
+            "Assets/_Project/Scenes/Authentication.unity",
+            "Assets/_Project/Scenes/CharacterCreator.unity",
+            "Assets/_Project/Scenes/RoomLobby.unity",
+            "Assets/_Project/Scenes/LoveTown.unity",
+            "Assets/_Project/Scenes/OurHome.unity",
+            "Assets/_Project/Scenes/SunsetBeach.unity",
+            "Assets/_Project/Scenes/DreamForest.unity",
+            "Assets/_Project/Scenes/SkyMountain.unity",
+            "Assets/_Project/Scenes/StarlightCity.unity"
         };
 
         private static string GetBuildOutputDirectory(string platformName)

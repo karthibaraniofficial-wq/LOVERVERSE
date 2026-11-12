@@ -36,6 +36,11 @@ namespace Loveverse.Movement
 
         private void Awake()
         {
+            if (_config == null)
+            {
+                _config = ScriptableObject.CreateInstance<MovementConfig>();
+            }
+
             _characterController = GetComponent<CharacterController>();
             if (_animator == null)
             {

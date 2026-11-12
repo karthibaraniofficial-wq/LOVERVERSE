@@ -28,6 +28,17 @@ namespace Loveverse.Memories
 
         private string StorageDirectory => Path.Combine(Application.persistentDataPath, "Memories");
 
+        private async void Awake()
+        {
+            if (ServiceRegistry.Instance.TryResolve<IMemoryService>(out _))
+            {
+                return;
+            }
+
+            await InitializeAsync();
+            ServiceRegistry.Instance.Register<IMemoryService>(this);
+        }
+
         public Task InitializeAsync()
         {
             if (!Directory.Exists(StorageDirectory))

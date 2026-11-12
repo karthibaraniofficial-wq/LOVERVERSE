@@ -1,0 +1,19 @@
+{
+    "name": "Loveverse.Networking",
+    "rootNamespace": "Loveverse.Networking",
+    "references": [
+        "Loveverse.Core",
+        "Loveverse.Movement",
+        "Loveverse.Characters",
+        "Loveverse.Romance"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

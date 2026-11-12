@@ -1,0 +1,20 @@
+{
+    "name": "Loveverse.UI",
+    "rootNamespace": "Loveverse.UI",
+    "references": [
+        "Loveverse.Core",
+        "Loveverse.Movement",
+        "Loveverse.Romance",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

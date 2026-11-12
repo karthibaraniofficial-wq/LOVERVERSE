@@ -1,0 +1,31 @@
+{
+    "name": "Loveverse.Tests",
+    "rootNamespace": "Loveverse.Tests",
+    "references": [
+        "Loveverse.Core",
+        "Loveverse.Movement",
+        "Loveverse.Characters",
+        "Loveverse.Romance",
+        "Loveverse.Networking",
+        "Loveverse.Home",
+        "Loveverse.Memories",
+        "Loveverse.World",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

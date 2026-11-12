@@ -34,9 +34,14 @@ namespace Loveverse.Camera
 
         public CameraMode CurrentMode => _currentMode;
 
+        public void Initialize(IInputService inputService)
+        {
+            _inputService = inputService;
+        }
+
         private void Start()
         {
-            if (ServiceRegistry.Instance.TryResolve<IInputService>(out var input))
+            if (_inputService == null && ServiceRegistry.Instance.TryResolve<IInputService>(out var input))
             {
                 _inputService = input;
             }

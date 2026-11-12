@@ -75,5 +75,22 @@ namespace Loveverse.Networking
             }
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Handles notification when a remote partner disconnects or departs from the private room.
+        /// </summary>
+        public void HandlePlayerLeft(string playerId)
+        {
+            if (string.IsNullOrEmpty(playerId)) return;
+
+            if (ConnectedPlayerCount > 1)
+            {
+                ConnectedPlayerCount--;
+            }
+
+            Lg.Info($"Player departed from room {CurrentRoomCode}: {playerId}");
+            OnPlayerLeft?.Invoke(playerId);
+            EventBus.Publish(new RoomStateChangedEvent(CurrentRoomCode, ConnectedPlayerCount, IsConnected));
+        }
     }
 }

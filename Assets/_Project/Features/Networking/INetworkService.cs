@@ -17,5 +17,6 @@ namespace Loveverse.Networking
         Task<string> CreatePrivateRoomAsync();
         Task<bool> JoinPrivateRoomAsync(string roomCode);
         Task LeaveRoomAsync();
+        void HandlePlayerLeft(string playerId);
     }
 }

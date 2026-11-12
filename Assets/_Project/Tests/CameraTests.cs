@@ -1,10 +1,31 @@
 using NUnit.Framework;
 using UnityEngine;
+using Loveverse.Camera;
+using Loveverse.Movement;
 
 namespace Loveverse.Tests
 {
     public class CameraTests
     {
+        private class FakeInputService : IInputService
+        {
+            public bool IsInitialized => true;
+            public Vector2 MoveInput { get; set; }
+            public Vector2 LookInput { get; set; }
+            public bool IsSprintPressed { get; set; }
+            public bool IsJumpTriggered { get; set; }
+            public bool IsInteractTriggered { get; set; }
+            public bool IsPhotoModeTriggered { get; set; }
+
+            public System.Threading.Tasks.Task InitializeAsync() => System.Threading.Tasks.Task.CompletedTask;
+            public void Shutdown() {}
+            public void SetVirtualMoveInput(Vector2 move) => MoveInput = move;
+            public void SetVirtualLookInput(Vector2 look) => LookInput = look;
+            public void TriggerVirtualJump() => IsJumpTriggered = true;
+            public void TriggerVirtualInteract() => IsInteractTriggered = true;
+            public void ToggleVirtualSprint() => IsSprintPressed = !IsSprintPressed;
+        }
+
         [Test]
         public void PitchClamping_ConstrainsWithinBounds()
         {
@@ -31,6 +52,39 @@ namespace Loveverse.Tests
             Assert.AreEqual(10f, pivot.x);
             Assert.AreEqual(1.4f, pivot.y);
             Assert.AreEqual(5f, pivot.z);
+        }
+
+        [Test]
+        public void CameraController_CanBeInitializedAndSetMode()
+        {
+            var go = new GameObject("TestCamera");
+            var cam = go.AddComponent<CameraController>();
+            var fakeInput = new FakeInputService();
+
+            cam.Initialize(fakeInput);
+            cam.SetCameraMode(CameraMode.PhotoMode);
+
+            Assert.AreEqual(CameraMode.PhotoMode, cam.CurrentMode);
+            Object.DestroyImmediate(go);
+        }
+
+        [Test]
+        public void PhotoModeController_ToggleTogglesActiveState()
+        {
+            var go = new GameObject("TestPhotoMode");
+            var photoMode = go.AddComponent<PhotoModeController>();
+            var fakeInput = new FakeInputService();
+
+            photoMode.Initialize(fakeInput);
+            Assert.IsFalse(photoMode.IsPhotoModeActive);
+
+            photoMode.TogglePhotoMode();
+            Assert.IsTrue(photoMode.IsPhotoModeActive);
+
+            photoMode.TogglePhotoMode();
+            Assert.IsFalse(photoMode.IsPhotoModeActive);
+
+            Object.DestroyImmediate(go);
         }
     }
 }

@@ -109,6 +109,13 @@ namespace Loveverse.Tests
             Assert.IsTrue(reconnected);
             Assert.IsTrue(netService.IsConnected);
 
+            // 9. Remote Partner Departure Handling
+            string departedPlayer = null;
+            netService.OnPlayerLeft += id => departedPlayer = id;
+            netService.HandlePlayerLeft("partner_01");
+            Assert.AreEqual("partner_01", departedPlayer);
+            Assert.AreEqual(1, netService.ConnectedPlayerCount);
+
             // Cleanup GameObjects
             Object.DestroyImmediate(netGo);
             Object.DestroyImmediate(requestServiceGo);

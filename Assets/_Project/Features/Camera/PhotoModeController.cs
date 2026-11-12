@@ -23,6 +23,11 @@ namespace Loveverse.Camera
         public event Action<bool> OnPhotoModeToggled;
         public event Action<Texture2D> OnPhotoCaptured;
 
+        public void Initialize(IInputService inputService)
+        {
+            _inputService = inputService;
+        }
+
         private void Start()
         {
             if (_photoCamera == null)
@@ -35,7 +40,7 @@ namespace Loveverse.Camera
                 _originalFov = _photoCamera.fieldOfView;
             }
 
-            if (ServiceRegistry.Instance.TryResolve<IInputService>(out var input))
+            if (_inputService == null && ServiceRegistry.Instance.TryResolve<IInputService>(out var input))
             {
                 _inputService = input;
             }

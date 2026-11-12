@@ -4,12 +4,14 @@
     "references": [
         "Loveverse.Core",
         "Loveverse.Movement",
+        "Loveverse.Camera",
         "Loveverse.Characters",
         "Loveverse.Romance",
         "Loveverse.Networking",
         "Loveverse.Home",
         "Loveverse.Memories",
         "Loveverse.World",
+        "Loveverse.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

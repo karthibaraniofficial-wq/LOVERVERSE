@@ -3,6 +3,7 @@
     "rootNamespace": "Loveverse.Camera",
     "references": [
         "Loveverse.Core",
+        "Loveverse.Movement",
         "Unity.Cinemachine",
         "Unity.InputSystem"
     ],

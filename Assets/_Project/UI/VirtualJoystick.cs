@@ -47,9 +47,10 @@ namespace Loveverse.UI
             _inputVector = new Vector2(position.x * 2f, position.y * 2f);
             _inputVector = (_inputVector.magnitude > 1.0f) ? _inputVector.normalized : _inputVector;
 
+            float radius = _handleRange > 0f ? _handleRange : (_background.sizeDelta.x * 0.5f);
             _handle.anchoredPosition = new Vector2(
-                _inputVector.x * (_background.sizeDelta.x / 2f),
-                _inputVector.y * (_background.sizeDelta.y / 2f)
+                _inputVector.x * radius,
+                _inputVector.y * radius
             );
 
             _inputService?.SetVirtualMoveInput(_inputVector);

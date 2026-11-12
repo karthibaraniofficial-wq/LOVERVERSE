@@ -32,6 +32,15 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
     expect(res.json().openapi).toBe('3.0.3');
   });
 
+  it('Rejects unauthenticated requests with 401 UNAUTHORIZED', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/v1/users/me'
+    });
+    expect(res.statusCode).toBe(401);
+    expect(res.json().error).toContain('UNAUTHORIZED');
+  });
+
   it('POST /api/v1/auth/session initializes a new user profile', async () => {
     const res = await app.inject({
       method: 'POST',
@@ -86,6 +95,21 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
     expect(joinBody.data.status).toBe('active');
   });
 
+  it('POST /api/v1/rooms/join rejects non-existent room code with 404', async () => {
+    const joinRes = await app.inject({
+      method: 'POST',
+      url: '/api/v1/rooms/join',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_2'
+      },
+      payload: {
+        invitationCode: 'XXXXXX'
+      }
+    });
+    expect(joinRes.statusCode).toBe(404);
+    expect(joinRes.json().error).toBe('ROOM_NOT_FOUND');
+  });
+
   it('GET and POST /api/v1/inventory/transactions executes validated unlock', async () => {
     const invRes = await app.inject({
       method: 'GET',
@@ -111,6 +135,68 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
     });
     expect(txRes.statusCode).toBe(200);
     expect(txRes.json().data.unlockedOutfits).toContain('outfit_dress_spring_01');
+  });
+
+  it('POST and GET /api/v1/memories creates and retrieves photo memories', async () => {
+    const createMem = await app.inject({
+      method: 'POST',
+      url: '/api/v1/memories',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      },
+      payload: {
+        worldId: 'world_demo',
+        caption: 'Sunset together in Romantic Garden',
+        locationId: 'RomanticGarden_01',
+        storageUrl: 'https://storage.googleapis.com/loveverse/memories/photo_01.png'
+      }
+    });
+    expect(createMem.statusCode).toBe(200);
+    expect(createMem.json().data.caption).toBe('Sunset together in Romantic Garden');
+
+    const getMem = await app.inject({
+      method: 'GET',
+      url: '/api/v1/memories/world_demo',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      }
+    });
+    expect(getMem.statusCode).toBe(200);
+    expect(getMem.json().data.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('PATCH /api/v1/worlds/world_demo updates persistent world layout', async () => {
+    const patchRes = await app.inject({
+      method: 'PATCH',
+      url: '/api/v1/worlds/world_demo',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      },
+      payload: {
+        timeOfDayHours: 19.5,
+        weather: 'rain'
+      }
+    });
+    expect(patchRes.statusCode).toBe(200);
+    expect(patchRes.json().data.timeOfDayHours).toBe(19.5);
+    expect(patchRes.json().data.weather).toBe('rain');
+  });
+
+  it('POST /api/v1/reports submits report for moderation review', async () => {
+    const reportRes = await app.inject({
+      method: 'POST',
+      url: '/api/v1/reports',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      },
+      payload: {
+        reportedUserId: 'bad_actor',
+        reason: 'Harassment',
+        details: 'Unwanted chat in public area'
+      }
+    });
+    expect(reportRes.statusCode).toBe(200);
+    expect(reportRes.json().success).toBe(true);
   });
 
   it('DELETE /api/v1/users/me deletes account for privacy compliance', async () => {

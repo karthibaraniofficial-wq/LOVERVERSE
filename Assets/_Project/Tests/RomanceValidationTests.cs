@@ -33,5 +33,18 @@ namespace Loveverse.Tests
             Assert.IsTrue(angleAhead <= 85f, "Directly ahead target should be in range");
             Assert.IsFalse(angleBehind <= 85f, "Behind target should be rejected");
         }
+
+        [Test]
+        public void DistanceValidation_DetectsOutOfBounds()
+        {
+            var posA = new Vector3(0f, 0f, 0f);
+            var posClose = new Vector3(0f, 0f, 2.0f);
+            var posFar = new Vector3(0f, 0f, 5.0f);
+
+            float range = 2.5f;
+
+            Assert.IsTrue(Vector3.Distance(posA, posClose) <= range);
+            Assert.IsFalse(Vector3.Distance(posA, posFar) <= range);
+        }
     }
 }

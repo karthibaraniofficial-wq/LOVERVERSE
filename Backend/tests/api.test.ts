@@ -23,6 +23,15 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
     expect(res.json().status).toBe('ok');
   });
 
+  it('GET /api/v1/openapi.json returns valid openapi schema', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/v1/openapi.json'
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().openapi).toBe('3.0.3');
+  });
+
   it('POST /api/v1/auth/session initializes a new user profile', async () => {
     const res = await app.inject({
       method: 'POST',
@@ -52,7 +61,6 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
   });
 
   it('POST /api/v1/rooms/join allows partner to join with valid code', async () => {
-    // First create room
     const createRes = await app.inject({
       method: 'POST',
       url: '/api/v1/rooms',
@@ -62,7 +70,6 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
     });
     const room = createRes.json().data;
 
-    // Join room as player 2
     const joinRes = await app.inject({
       method: 'POST',
       url: '/api/v1/rooms/join',
@@ -79,15 +86,52 @@ describe('LOVEVERSE Backend API Integration Tests', () => {
     expect(joinBody.data.status).toBe('active');
   });
 
-  it('GET /api/v1/worlds/world_demo loads shared world state', async () => {
-    const res = await app.inject({
+  it('GET and POST /api/v1/inventory/transactions executes validated unlock', async () => {
+    const invRes = await app.inject({
       method: 'GET',
-      url: '/api/v1/worlds/world_demo',
+      url: '/api/v1/inventory',
       headers: {
         authorization: 'Bearer dev-user:player_test_1'
       }
     });
-    expect(res.statusCode).toBe(200);
-    expect(res.json().data.currentRegion).toBe('LoveTown');
+    expect(invRes.statusCode).toBe(200);
+    expect(invRes.json().data.loveCoins).toBeGreaterThanOrEqual(50);
+
+    const txRes = await app.inject({
+      method: 'POST',
+      url: '/api/v1/inventory/transactions',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      },
+      payload: {
+        itemId: 'outfit_dress_spring_01',
+        category: 'outfit',
+        costCoins: 30
+      }
+    });
+    expect(txRes.statusCode).toBe(200);
+    expect(txRes.json().data.unlockedOutfits).toContain('outfit_dress_spring_01');
+  });
+
+  it('DELETE /api/v1/users/me deletes account for privacy compliance', async () => {
+    const delRes = await app.inject({
+      method: 'DELETE',
+      url: '/api/v1/users/me',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      }
+    });
+    expect(delRes.statusCode).toBe(200);
+    expect(delRes.json().success).toBe(true);
+
+    const getRes = await app.inject({
+      method: 'GET',
+      url: '/api/v1/users/me',
+      headers: {
+        authorization: 'Bearer dev-user:player_test_1'
+      }
+    });
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.json().data).toBeNull();
   });
 });

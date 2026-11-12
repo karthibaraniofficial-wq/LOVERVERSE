@@ -7,6 +7,13 @@ export interface UserProfile {
   lastLogin: string;
 }
 
+export interface UserInventory {
+  userId: string;
+  unlockedOutfits: string[];
+  unlockedFurniture: string[];
+  loveCoins: number;
+}
+
 export interface RoomSession {
   roomId: string;
   invitationCode: string;
@@ -44,6 +51,7 @@ export interface SharedMemory {
 // In-Memory Repository for development & CI testing
 export class DataRepository {
   private users = new Map<string, UserProfile>();
+  private inventories = new Map<string, UserInventory>();
   private rooms = new Map<string, RoomSession>();
   private worlds = new Map<string, SharedWorld>();
   private memories = new Map<string, SharedMemory>();
@@ -68,6 +76,30 @@ export class DataRepository {
 
   async saveUser(user: UserProfile): Promise<void> {
     this.users.set(user.userId, user);
+  }
+
+  async deleteUser(userId: string): Promise<boolean> {
+    this.inventories.delete(userId);
+    return this.users.delete(userId);
+  }
+
+  // Inventories
+  async getInventory(userId: string): Promise<UserInventory> {
+    let inv = this.inventories.get(userId);
+    if (!inv) {
+      inv = {
+        userId,
+        unlockedOutfits: ['top_default', 'bottom_default'],
+        unlockedFurniture: ['bench_wood_01'],
+        loveCoins: 100
+      };
+      this.inventories.set(userId, inv);
+    }
+    return inv;
+  }
+
+  async saveInventory(inv: UserInventory): Promise<void> {
+    this.inventories.set(inv.userId, inv);
   }
 
   // Rooms

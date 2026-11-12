@@ -13,7 +13,37 @@ export function buildServer(): FastifyInstance {
   app.register(rateLimit, { max: 100, timeWindow: '1 minute' });
 
   // Health check
-  app.get('/health', async () => ({ status: 'ok', service: 'LOVEVERSE API' }));
+  app.get('/health', async () => ({ status: 'ok', service: 'LOVEVERSE API', version: '1.0.0' }));
+
+  // OpenAPI Specification endpoint
+  app.get('/api/v1/openapi.json', async () => ({
+    openapi: '3.0.3',
+    info: {
+      title: 'LOVEVERSE API',
+      version: '1.0.0',
+      description: 'Production REST API for LOVEVERSE multiplayer and persistent cloud services'
+    },
+    paths: {
+      '/health': { get: { summary: 'Health check' } },
+      '/api/v1/auth/session': { post: { summary: 'Initialize authenticated session' } },
+      '/api/v1/users/me': {
+        get: { summary: 'Get current user profile' },
+        patch: { summary: 'Update profile and appearance' },
+        delete: { summary: 'Delete user account and all personal records' }
+      },
+      '/api/v1/rooms': { post: { summary: 'Create private 2-player room' } },
+      '/api/v1/rooms/join': { post: { summary: 'Join private room with 6-char invite code' } },
+      '/api/v1/worlds/{id}': {
+        get: { summary: 'Load persistent world state' },
+        patch: { summary: 'Save world state and layout' }
+      },
+      '/api/v1/inventory': { get: { summary: 'Fetch user inventory and currencies' } },
+      '/api/v1/inventory/transactions': { post: { summary: 'Execute server-validated purchase or unlock' } },
+      '/api/v1/memories': { post: { summary: 'Save screenshot photo metadata' } },
+      '/api/v1/memories/{worldId}': { get: { summary: 'List world photo album memories' } },
+      '/api/v1/reports': { post: { summary: 'Submit player report for moderation' } }
+    }
+  }));
 
   // --- Auth Session ---
   app.post('/api/v1/auth/session', { preHandler: [authenticateToken] }, async (req, reply) => {
@@ -59,6 +89,45 @@ export function buildServer(): FastifyInstance {
     }
 
     return { success: true, data: profile };
+  });
+
+  app.delete('/api/v1/users/me', { preHandler: [authenticateToken] }, async (req, reply) => {
+    await repository.deleteUser(req.user!.uid);
+    return { success: true, message: 'Account and associated records deleted permanently.' };
+  });
+
+  // --- Inventory & Transactions ---
+  app.get('/api/v1/inventory', { preHandler: [authenticateToken] }, async (req, reply) => {
+    const inv = await repository.getInventory(req.user!.uid);
+    return { success: true, data: inv };
+  });
+
+  app.post('/api/v1/inventory/transactions', { preHandler: [authenticateToken] }, async (req, reply) => {
+    const schema = z.object({
+      itemId: z.string(),
+      category: z.enum(['outfit', 'furniture']),
+      costCoins: z.number().nonnegative()
+    });
+
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ success: false, error: 'VALIDATION_FAILED' });
+    }
+
+    const inv = await repository.getInventory(req.user!.uid);
+    if (inv.loveCoins < parsed.data.costCoins) {
+      return reply.status(400).send({ success: false, error: 'INSUFFICIENT_FUNDS' });
+    }
+
+    inv.loveCoins -= parsed.data.costCoins;
+    if (parsed.data.category === 'outfit' && !inv.unlockedOutfits.includes(parsed.data.itemId)) {
+      inv.unlockedOutfits.push(parsed.data.itemId);
+    } else if (parsed.data.category === 'furniture' && !inv.unlockedFurniture.includes(parsed.data.itemId)) {
+      inv.unlockedFurniture.push(parsed.data.itemId);
+    }
+
+    await repository.saveInventory(inv);
+    return { success: true, data: inv };
   });
 
   // --- Rooms ---

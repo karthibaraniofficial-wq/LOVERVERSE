@@ -21,3 +21,4 @@ namespace Loveverse.Core
         Task<bool> RequestPhotoStoragePermissionAsync();
     }
 }
+

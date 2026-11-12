@@ -23,3 +23,4 @@ namespace Loveverse.Core
         Ultra
     }
 }
+
